@@ -78,7 +78,7 @@ func (p *Program) String() string {
 func (ls *LetStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(ls.Token.Literal() + " ")
+	out.WriteString(ls.TokenLiteral() + " ")
 	out.WriteString(ls.Name.String())
 	out.WriteString(" = ")
 
@@ -105,7 +105,7 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
-func (es *ExpressionStatement) string() string {
+func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
 	}
