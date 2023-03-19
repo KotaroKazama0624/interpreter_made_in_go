@@ -16,12 +16,12 @@ type Integer struct {
 func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 
 const (
-	INTEGER_0BJ = "INTEGER"
+	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
 	NULL_OBJ    = "NULL"
 )
 
-func (i *Integer) Type() ObjectType { return INTEGER_0BJ }
+func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 
 type Boolean struct {
 	Value bool
