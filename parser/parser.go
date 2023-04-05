@@ -72,6 +72,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
+	p.registerPrefix(token.LOOP, p.parseLoopExpression)
+	p.registerPrefix(token.MACRO, p.parseMacroLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -509,4 +511,47 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	}
 
 	return list
+}
+
+func (p *Parser) parseLoopExpression() ast.Expression {
+	// ノード生成
+	expression := &ast.LoopExpression{Token: p.curToken}
+	// 左括弧 「 ( 」 だったらトークンを進める 違ったらnilを返却
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	// 次トークンであるConditonを見に行く
+	p.nextToken()
+	// 条件を取得 (ここで数値が入る)
+	expression.Condition = p.parseExpression(LOWEST)
+	// 右括弧 「 ) 」 だったらトークンを進める 違ったらnilを返却
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	// 右ふにゃ括弧「 { 」だったらトークンを進める 違ったらnilを返却
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	// 内部のループ部分を取得
+	expression.Internal = p.parseBlockStatement()
+
+	return expression
+}
+
+func (p *Parser) parseMacroLiteral() ast.Expression {
+	lit := &ast.MacroLiteral{Token: p.curToken}
+
+	if !p.expectPeek((token.LPAREN)) {
+		return nil
+	}
+
+	lit.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	lit.Body = p.parseBlockStatement()
+
+	return lit
 }

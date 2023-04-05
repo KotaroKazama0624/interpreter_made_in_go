@@ -26,6 +26,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalProgram(node, env)
 
 	case *ast.CallExpression:
+		if node.Function.TokenLiteral() == "quote" {
+			return quote(node.Arguments[0], env)
+		}
 		function := Eval(node.Function, env)
 		if isError(function) {
 			return function
@@ -77,6 +80,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
+
+	case *ast.LoopExpression:
+		return evalLoopExpression(node, env)
 
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue, env)
@@ -446,4 +452,21 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	}
 
 	return pair.Value
+}
+
+func evalLoopExpression(le *ast.LoopExpression, env *object.Environment) object.Object {
+	condition := Eval(le.Condition, env)
+
+	if isError(condition) {
+		return condition
+	}
+
+	countdown := condition.(*object.Integer).Value
+	for countdown > 1 {
+		Eval(le.Internal, env)
+		countdown--
+	}
+
+	last := Eval(le.Internal, env)
+	return last
 }

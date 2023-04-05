@@ -335,3 +335,47 @@ func (hl *HashLiteral) String() string {
 
 	return out.String()
 }
+
+type LoopExpression struct {
+	Token     token.Token
+	Condition Expression
+	Internal  *BlockStatement
+}
+
+func (le *LoopExpression) expressionNode()      {}
+func (le *LoopExpression) TokenLiteral() string { return le.Token.Literal }
+func (le *LoopExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("loop")
+	out.WriteString(le.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(le.Internal.String())
+
+	return out.String()
+}
+
+type MacroLiteral struct {
+	Token      token.Token // 'macro' トークン
+	Parameters []*Identifier
+	Body       *BlockStatement
+}
+
+func (ml *MacroLiteral) expressionNode()      {}
+func (ml *MacroLiteral) TokenLiteral() string { return ml.Token.Literal }
+func (ml *MacroLiteral) String() string {
+	var out bytes.Buffer
+
+	params := []string{}
+	for _, p := range ml.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString(ml.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") ")
+	out.WriteString(ml.Body.String())
+
+	return out.String()
+}
