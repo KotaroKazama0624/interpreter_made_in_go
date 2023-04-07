@@ -45,6 +45,30 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
+func StartFromTxtfile(a string, out io.Writer) {
+
+	env := object.NewEnvironment()
+	macroEnv := object.NewEnvironment()
+
+	line := a
+	l := lexer.New(line)
+	p := parser.New(l)
+
+	program := p.ParseProgram()
+	if len(p.Errors()) != 0 {
+		printParserErrors(out, p.Errors())
+	}
+
+	evaluator.DefineMacros(program, macroEnv)
+	expanded := evaluator.ExpandMacros(program, macroEnv)
+
+	evaluated := evaluator.Eval(expanded, env)
+	if evaluated != nil {
+		io.WriteString(out, evaluated.Inspect())
+		io.WriteString(out, "\n")
+	}
+}
+
 const MONKEY_FACE = `            __,__
    .--.  .-"     "-.  .--.
   / .. \/  .-. .-.  \/ .. \
