@@ -455,18 +455,41 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 }
 
 func evalLoopExpression(le *ast.LoopExpression, env *object.Environment) object.Object {
-	condition := Eval(le.Condition, env)
+	//condition := Eval(le.Condition, env)
 
-	if isError(condition) {
-		return condition
-	}
+	//var result object.Object
 
-	countdown := condition.(*object.Integer).Value
-	for countdown > 1 {
+	for {
+		condition := Eval(le.Condition, env)
+
+		if !isTruthy(condition) {
+			break
+		}
+
+		if isError(condition) {
+			return condition
+		}
+
 		Eval(le.Internal, env)
-		countdown--
+
 	}
 
-	last := Eval(le.Internal, env)
-	return last
+	return NULL
 }
+
+//for isTruthy(condition) {
+//	return Eval(le.Internal, env)
+//}
+
+//result := Eval(le.Internal, env)
+//return result
+
+/*countdown := condition.(*object.Integer).Value
+for countdown > 1 {
+	Eval(le.Internal, env)
+	countdown--
+}
+
+last := Eval(le.Internal, env)
+return last*/
+//}

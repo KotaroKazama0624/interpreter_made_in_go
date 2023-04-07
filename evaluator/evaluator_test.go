@@ -603,7 +603,11 @@ func TestLoopExpressions(t *testing.T) {
 		input    string
 		expected interface{}
 	}{
-		{"loop (1) { 10 }", 10},
+		{"let x = 0 loop (x < 5) { let x = x + 1 } x", 5},
+		{"loop (1 > 2) { 10 }", nil},
+		//{"loop (1 < 2) { 10 }", 10},
+		//{"loop (true) { 10 }", 10},
+		{"loop (false) { 10 }", nil},
 	}
 
 	for _, tt := range tests {
