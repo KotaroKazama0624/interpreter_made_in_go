@@ -1,5 +1,7 @@
 package object
 
+import "fmt"
+
 func NewEnvironment() *Environment {
 	s := make(map[string]Object)
 	return &Environment{store: s}
@@ -19,6 +21,14 @@ func (e *Environment) Get(name string) (Object, bool) {
 }
 
 func (e *Environment) Set(name string, val Object) Object {
+	e.store[name] = val
+	return val
+}
+
+func (e *Environment) Update(name string, val Object) Object {
+	if _, ok := e.store[name]; !ok {
+		return &Error{Message: fmt.Sprintf("%s is not defined", name)}
+	}
 	e.store[name] = val
 	return val
 }

@@ -355,6 +355,31 @@ func (le *LoopExpression) String() string {
 	return out.String()
 }
 
+type ForExpression struct {
+	Token         token.Token
+	Initstatement Statement
+	Condition     Expression
+	Changeformula Expression
+	Internal      *BlockStatement
+}
+
+func (fe *ForExpression) expressionNode()      {}
+func (fe *ForExpression) TokenLiteral() string { return fe.Token.Literal }
+func (fe *ForExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("for")
+	out.WriteString(fe.Initstatement.String())
+	out.WriteString(" ")
+	out.WriteString(fe.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(fe.Changeformula.String())
+	out.WriteString(" ")
+	out.WriteString(fe.Internal.String())
+
+	return out.String()
+}
+
 type MacroLiteral struct {
 	Token      token.Token // 'macro' トークン
 	Parameters []*Identifier

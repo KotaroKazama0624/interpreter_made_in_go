@@ -620,3 +620,26 @@ func TestLoopExpressions(t *testing.T) {
 		}
 	}
 }
+
+func TestForExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"let x = 0; for(let i = 0, i < 5, ++i) {let x = x + 1}", 5},
+		{"let x = 0; for(let i = 0, i > 5, ++i) {let x = x + 1}", nil},
+		//{"loop (1 < 2) { 10 }", 10},
+		//{"loop (true) { 10 }", 10},
+		//{"loop (false) { 10 }", nil},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}

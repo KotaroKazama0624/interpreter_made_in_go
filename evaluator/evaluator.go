@@ -56,12 +56,20 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalHashLiteral(node, env)
 
 	case *ast.PrefixExpression:
-		right := Eval(node.Right, env)
-		if isError(right) {
-			return right
+		switch node.Operator {
+		case "++":
+			right, ok := node.Right.(*ast.Identifier)
+			if !ok {
+				return newError("Invalid right-hand identifier in prefix operation: %s", node.Right)
+			}
+			return evalIncrementPrefixOperatorExpression(node.Operator, right, env)
+		default:
+			right := Eval(node.Right, env)
+			if isError(right) {
+				return right
+			}
+			return evalPrefixExpression(node.Operator, right)
 		}
-		return evalPrefixExpression(node.Operator, right)
-
 	case *ast.InfixExpression:
 		left := Eval(node.Left, env)
 		if isError(left) {
@@ -83,6 +91,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.LoopExpression:
 		return evalLoopExpression(node, env)
+
+	case *ast.ForExpression:
+		return evalForExpression(node, env)
 
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue, env)
@@ -357,9 +368,26 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 		return evalBangOperatorExpression(right)
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)
+	//case "++":
+	//	return evalIncrementPrefixOperatorExpression(right)
 	default:
 		return newError("unknown operator: %s%s", operator, right.Type())
 	}
+}
+
+func evalIncrementPrefixOperatorExpression(operator string, right *ast.Identifier, env *object.Environment) object.Object {
+	curVar, ok := env.Get(right.Value)
+
+	if !ok {
+		return newError("%s is not defined", right.Value)
+	}
+
+	if operator == "++" && curVar.Type() == object.INTEGER_OBJ {
+		curValue := curVar.(*object.Integer).Value
+		return env.Update(right.Value, &object.Integer{Value: curValue + 1})
+	}
+
+	return newError("unknown prefix operator: %s%s", operator, curVar.Type())
 }
 
 func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
@@ -471,6 +499,38 @@ func evalLoopExpression(le *ast.LoopExpression, env *object.Environment) object.
 		}
 
 		Eval(le.Internal, env)
+
+	}
+
+	return NULL
+}
+
+func evalForExpression(fe *ast.ForExpression, env *object.Environment) object.Object {
+	initstatement := Eval(fe.Initstatement, env)
+
+	if isError(initstatement) {
+		return initstatement
+	}
+
+	//var result object.Object
+
+	for {
+		condition := Eval(fe.Condition, env)
+
+		if !isTruthy(condition) {
+			break
+		}
+
+		if isError(condition) {
+			return condition
+		}
+
+		Eval(fe.Internal, env)
+
+		changeformula := Eval(fe.Changeformula, env)
+		if isError(changeformula) {
+			return changeformula
+		}
 
 	}
 

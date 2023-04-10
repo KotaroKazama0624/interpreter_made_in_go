@@ -144,6 +144,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		{"-15;", "-", 15},
 		{"!true;", "!", true},
 		{"!false;", "!", false},
+		{"++i", "++", "i"},
 	}
 
 	for _, tt := range prefixTests {
@@ -937,6 +938,7 @@ func TestLoopExpression(t *testing.T) {
 
 	l := lexer.New(input)
 	p := New(l)
+
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -977,6 +979,56 @@ func TestLoopExpression(t *testing.T) {
 	}
 
 }
+
+/*func TestForExpression(t *testing.T) {
+	input := `for (let i = 0; i < 5; ++i) { x }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Body does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	exp, ok := stmt.Expression.(*ast.ForExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not ast.ForExpression. got=%T",
+			stmt.Expression)
+	}
+
+	//if !testLetStatement(t, exp.Initstatement, "i") {
+	//	return
+	//}
+
+	//if !testInfixExpression(t, exp.Condition, "i", "<", "5") {
+	//	return
+	//}
+
+	if len(exp.Internal.Statements) != 1 {
+		t.Errorf("consequence is not 1 statements. got=%d\n",
+			len(exp.Internal.Statements))
+	}
+
+	Internal, ok := exp.Internal.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T",
+			exp.Internal.Statements[0])
+	}
+
+	if !testIntegerLiteral(t, Internal.Expression, 0) {
+		return
+	}
+
+}*/
 
 func TestMacroLiteralParsing(t *testing.T) {
 	input := `macro(x, y) {x + y}`

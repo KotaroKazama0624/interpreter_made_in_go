@@ -32,6 +32,11 @@ func TestNextToken(t *testing.T) {
 
 	loop(5){}
 	macro(x, y) { x + y; };
+
+	for(let i = 0, i < 5, ++i){
+		i
+	}
+
 	`
 
 	tests := []struct {
@@ -143,6 +148,23 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
+		{token.FOR, "for"},
+		{token.LPAREN, "("},
+		{token.LET, "let"},
+		{token.IDENT, "i"},
+		{token.ASSIGN, "="},
+		{token.INT, "0"},
+		{token.COMMA, ","},
+		{token.IDENT, "i"},
+		{token.LT, "<"},
+		{token.INT, "5"},
+		{token.COMMA, ","},
+		{token.INCREMENT, "++"},
+		{token.IDENT, "i"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "i"},
+		{token.RBRACE, "}"},
 		{token.EOF, ""},
 	}
 

@@ -22,8 +22,9 @@ const (
 	LT = "<"
 	GT = ">"
 
-	EQ     = "=="
-	NOT_EQ = "!="
+	EQ        = "=="
+	NOT_EQ    = "!="
+	INCREMENT = "++"
 
 	// Delimiters
 	COMMA     = ","
@@ -46,6 +47,7 @@ const (
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
 	LOOP     = "LOOP"
+	FOR      = "FOR"
 	MACRO    = "MACRO"
 )
 
@@ -63,6 +65,7 @@ var keywords = map[string]TokenType{
 	"else":   ELSE,
 	"return": RETURN,
 	"loop":   LOOP,
+	"for":    FOR,
 	"macro":  MACRO,
 }
 
