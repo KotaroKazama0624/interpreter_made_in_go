@@ -1,6 +1,8 @@
 package lexer
 
-import "interpreter_made_in_go/token"
+import (
+	"interpreter_made_in_go/token"
+)
 
 type Lexer struct {
 	input        string
@@ -125,7 +127,7 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func (l *Lexer) readString() string {
+/*func (l *Lexer) readString() string {
 	position := l.position + 1
 	for {
 		l.readChar()
@@ -134,6 +136,41 @@ func (l *Lexer) readString() string {
 		}
 	}
 	return l.input[position:l.position]
+}*/
+
+func (l *Lexer) readString() string {
+	out := ""
+
+	for {
+		l.readChar()
+		if l.ch == '"' {
+			break
+		}
+
+		// エスケープシーケンスの実装
+		if l.ch == '\\' {
+			l.readChar()
+
+			if l.ch == byte('n') {
+				l.ch = '\n'
+			}
+			if l.ch == byte('r') {
+				l.ch = '\r'
+			}
+			if l.ch == byte('t') {
+				l.ch = '\t'
+			}
+			if l.ch == byte('"') {
+				l.ch = '"'
+			}
+			if l.ch == byte('\\') {
+				l.ch = '\\'
+			}
+		}
+		out = out + string(l.ch)
+	}
+
+	return out
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
